@@ -8,7 +8,7 @@ connectDB();
 app.use(express.json());
 
 app.get('/health',(req,res) =>{
-    res.json({status : 'OK',messsage : 'Fintech API is running'});
+    res.json({status : 'OK',message : 'Fintech API is running'});
 });
 
 app.get('/ping',(req,res) =>{
