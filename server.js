@@ -7,6 +7,8 @@ connectDB();
 
 app.use(express.json());
 
+app.use('/api/auth', require('./routes/auth'));
+
 app.get('/health',(req,res) =>{
     res.json({status : 'OK',message : 'Fintech API is running'});
 });
