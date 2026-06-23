@@ -57,4 +57,35 @@ router.post('/add',protect,async(req,res) => {
     }
 });
 
+router.get('/',protect,async(req,res)=>{
+    try{
+        const {page = 0, limit = 10, type, category} = req.query;
+    
+
+    const filter = {user: req.user.userId};
+    if(type) filter.type = type;
+    if(category) filter.category = category;
+
+    const[transactions,total] = await Promise.all([
+        Transaction.find(filter)
+        .sort({createdAt: -1})
+        .skip(Number(page) * Number(limit))
+        .limit(Number(limit)),
+        Transaction.countDocuments(filter)
+    ]);
+
+
+    res.json({
+        transactions,
+        total,
+        pages: Math.ceil(total/Number(limit)),
+        currentPage: Number(page)
+    });
+
+    } catch(err) {
+        res.status(500).json({ error: err.message });
+    }
+
+});
+
 module.exports = router;
