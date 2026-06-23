@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const protect = require('../middleware/auth');
-const Transaction = require('../models/transactions');
+const Transaction = require('../models/transaction');
 const User = require('../models/user');
 
 router.post('/add',protect,async(req,res) => {
