@@ -47,6 +47,26 @@ router.post('/withdraw',protect,async(req,res)=>{
     } catch(err){
         res.status(400).json({error: err.message});
     }
-})
+});
+
+router.post('/transfer', protect, async (req, res) => {
+  try {
+    const { receiverEmail, amount, description } = req.body;
+
+    if (!receiverEmail)
+      return res.status(400).json({ error: 'Receiver email is required' });
+
+    const result = await walletService.transfer(
+      req.user.userId,
+      receiverEmail,
+      amount,
+      description
+    );
+
+    res.status(201).json(result);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
 module.exports = router;
