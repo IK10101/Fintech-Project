@@ -1,13 +1,15 @@
 const express = require('express');
 const router = express.Router();
 const protect = require('../middleware/auth');
+const validate = require('../middleware/validate');
+const { transactionValidator } = require('../middleware/validators');
 const Transaction = require('../models/transaction');
 const User = require('../models/user');
 
-router.post('/add',protect,async(req,res) => {
+router.post('/add', protect, transactionValidator, validate, async(req,res) => {
     try{
         const {type,amount,category,description} = req.body;
-        const userId = req.user.userId;
+        const userId = req.foundUser.userId;
 
         if (!type || !amount){
             return res.status(400).json({ error: 'Type and amount are required' });
@@ -17,39 +19,39 @@ router.post('/add',protect,async(req,res) => {
              return res.status(400).json({ error: 'Type must be credit or debit' });
         }
 
-        const user = await User.findById(userId);
+        const foundUser = await User.findById(userId);
 
-        if(!user){
+        if(!foundUser){
              return res.status(404).json({ error: 'User Not Found' });
         }
 
-        if(type==='debit' && user.balance<amount){
+        if(type==='debit' && foundUser.balance<amount){
              return res.status(400).json({ error: 'Insufficient balance' });
         }
 
         if(type==='credit' ){
-            user.balance += amount;
+            foundUser.balance += amount;
         } else {
-            user.balance -= amount;
+            foundUser.balance -= amount;
         }
 
-        await user.save();
+        await foundUser.save();
 
 
 
         const newTransaction = await Transaction.create({
-            user: userId,
+            foundUser: userId,
             type,
             amount,
             category: category || 'other',
             description,
-            balanceAfter: user.balance
+            balanceAfter: foundUser.balance
         });
 
         res.status(201).json({
             message: 'Transaction logged successfully',
             transaction: newTransaction,
-            newBalance: user.balance
+            newBalance: foundUser.balance
         });
 
     } catch(err) {
@@ -62,7 +64,7 @@ router.get('/',protect,async(req,res)=>{
         const {page = 0, limit = 10, type, category} = req.query;
     
 
-    const filter = {user: req.user.userId};
+    const filter = {foundUser: req.foundUser.userId};
     if(type) filter.type = type;
     if(category) filter.category = category;
 

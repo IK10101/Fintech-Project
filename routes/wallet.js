@@ -3,6 +3,8 @@ const router = express.Router();
 const protect = require('../middleware/auth');
 const walletService = require('../services/walletService');
 const { getBalance } = require('../services/walletService');
+const validate = require('../middleware/validate');                          
+const { amountValidator, transferValidator } = require('../middleware/validators'); 
 
 
 router.get('/balance',protect,async(req,res)=>{
@@ -15,7 +17,7 @@ router.get('/balance',protect,async(req,res)=>{
 
 });
 
-router.post('/deposit',protect,async(req,res)=>{
+router.post('/deposit', protect, amountValidator, validate,async(req,res)=>{
     try {
         const {amount,description} = req.body;
         const result = await walletService.deposit(
@@ -32,7 +34,7 @@ router.post('/deposit',protect,async(req,res)=>{
     }
 });
 
-router.post('/withdraw',protect,async(req,res)=>{
+router.post('/withdraw', protect, amountValidator, validate, async(req,res)=>{
     try {
         const {amount,description} = req.body;
         const result = await walletService.withdraw(
@@ -49,7 +51,7 @@ router.post('/withdraw',protect,async(req,res)=>{
     }
 });
 
-router.post('/transfer', protect, async (req, res) => {
+router.post('/transfer', protect,transferValidator, validate, async (req, res) => {
   try {
     const { receiverEmail, amount, description } = req.body;
 
