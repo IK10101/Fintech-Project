@@ -1,5 +1,3 @@
-const { error } = require("ajv/dist/vocabularies/applicator/dependencies");
-
 const errorHandler = (err,req,res,next) => {
     console.error(`[${new Date().toISOString()}] ${err.stack}`);
 
