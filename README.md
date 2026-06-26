@@ -83,3 +83,7 @@ Authorization: Bearer <your_jwt_token>
 - **Event Sourcing** — Every balance change is logged with balanceAfter snapshot
 - **Service Layer** — Business logic separated from route handlers
 - **Pagination** — All list endpoints support page and limit params
+
+
+## 🌍 Live Demo
+Base URL: `https://fintracker-dwz1.onrender.com`
