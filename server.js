@@ -1,11 +1,28 @@
 const express = require ('express');
 const app = express();
+const errorHandler = require('./middleware/errorHandler');
+const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
 
 connectDB();
-
-
 app.use(express.json());
+
+
+const generalLimiter = rateLimit({
+    windowMs: 15*60*1000,
+    max: 100,
+    message: {error: 'Too many requests, please try again later'}
+
+});
+
+const authLimiter = rateLimit({
+    windowMs: 15*60*1000,
+    max: 10,
+    message: {error: 'Too many login attempts, please try again later'}
+    
+});
+
+app.use(generalLimiter);
 
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/transactions', require('./routes/transactions'));
@@ -19,6 +36,8 @@ app.get('/health',(req,res) =>{
 app.get('/ping',(req,res) =>{
     res.json({pong  : true, timestamp : Date.now()});
 });
+
+app.use(errorHandler);
 
 app.listen(3000,()=>
     console.log('Server running on port 3000')
